@@ -10,22 +10,46 @@ exports.getExpences = ((req,res,next)=>{
 });
 
 exports.postExpence = ((req,res,next)=>{
-    console.log(req.query)
     const expence = req.query.expence;
     const descrip = req.query.descrip;
     const category = req.query.category;
+    const edit = req.query.edit;
+    const id = req.query.id;
+    console.log(id);
+    if(!edit){
+      Expence.create({
+        expense:expence,
+        description:descrip,
+        category:category
+  
+      })
+      .then(result=>{
+        res.redirect('/home')
+      })
+    }else{
+      Expence.findAll({where:{id:id}})
+      .then(response=>{
+        response[0].expense = expence;
+        response[0].description = descrip;
+        response[0].category = category;
+        response[0].save();
 
-    Expence.create({
-      expense:expence,
-      description:descrip,
-      category:category
-
-    })
-    .then(result=>{
-      res.redirect('/home')
-    })
+      }).then(res.redirect('/home'))
+    }
+    
     
 });
+
+exports.editExpence = ((req,res,next)=>{
+  const id = req.params.id;
+  Expence.findAll({where:{id:id}})
+  .then(expence=>{
+    res.send(expence[0]);
+  })
+  
+});
+
+
 
 exports.deleteExpence = ((req,res,next)=>{
   console.log(req.params.id)
